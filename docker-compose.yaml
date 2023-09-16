@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+
+  redis:
+    container_name: converter_redis
+    image: redis:latest
+    env_file:
+      - ./.env
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - converter
+
+  rabbitmq:
+    container_name: converter_rabbitmq
+    image: rabbitmq:latest
+    env_file:
+      - ./.env
+    restart: always
+    ports:
+      - "5672:5672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 10s
+      retries: 200
+    networks:
+      - converter
+
+  celery_worker:
+    container_name: converter_celery
+    build:
+      context: .
+    image: celery:latest
+    env_file:
+      - ./.env
+    command: celery -A api.tasks worker --loglevel=INFO -B
+    restart: always
+    networks:
+      - converter
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      fastapi:
+        condition: service_started
+
+  fastapi:
+    container_name: converter_fastapi
+    build:
+      context: .
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    networks:
+      - converter
+    restart: always
+    depends_on:
+      - redis
+
+
+networks:
+  converter:
+    driver: bridge

@@ -1,0 +1,6 @@
+fastapi[all]
+psycopg2-binary
+redis
+celery
+pandas
+environs
