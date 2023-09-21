@@ -7,7 +7,11 @@ class Converter:
     def __init__(self):
         self.file = 'https://www.cbr-xml-daily.ru/daily_json.js'
         self.cache = Cache()
-
+    
+    """
+    Получение данныъ из файла или из кэша.
+    """
+    
     def read_data(self):
         cache = self.cache.get_cache()
         if cache:
@@ -18,9 +22,13 @@ class Converter:
         self.cache.set_cache(data)
         return df
 
+    """
+    Получение актуальной стоимости валюты.
+    """
+
     def get_currency_value(self, currency: str):
         data = self.read_data()
-        currency_value = float
+        currency_value = 0
         if currency == 'RUB':
             return 1
         for i in data.iterrows():
@@ -31,6 +39,10 @@ class Converter:
                     currency_value = i[1]['Valute']['Value']
         return currency_value
 
+    """
+    Подсчет курса на основе стоимости валют.
+    """
+
     def counting(self, from_currency: str, to_currency: str, value: int | float):
         try:
             from_currency_value = self.get_currency_value(from_currency)
@@ -39,6 +51,10 @@ class Converter:
             return JSONResponse({"result": f"{result}"})
         except TypeError:
             return JSONResponse({"error": f"one of currencies not found"})
+
+    """
+    Возврат результата.
+    """
 
     def converter(self, from_currency: str, to_currency: str, value: int | float):
         from_currency = from_currency.upper()
