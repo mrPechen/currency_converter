@@ -9,7 +9,7 @@ class Converter:
         self.cache = Cache()
     
     """
-    Получение данныъ из файла или из кэша.
+    Получение данных из файла или из кэша.
     """
     
     def read_data(self):
