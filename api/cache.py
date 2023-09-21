@@ -11,7 +11,7 @@ class Cache:
         self.redis = Redis(host=env.str('REDIS_HOST'), port=env.int('REDIS_PORT'), db=1, decode_responses=True)
 
     def set_cache(self, data: Any):
-        return self.redis.set('data', data, ex=18000)
+        return self.redis.set('data', data)
 
     def get_cache(self):
         return self.redis.get('data')
